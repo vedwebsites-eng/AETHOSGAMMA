@@ -1,0 +1,52 @@
+{
+  "entities": {
+    "GlobalClock": {
+      "title": "Global Clock",
+      "description": "System-wide clock settings and last reset timestamp",
+      "type": "object",
+      "properties": {
+        "lastResetAt": { "type": "string", "format": "date-time" },
+        "resetTime": { "type": "string", "description": "Format HH:mm" },
+        "timezone": { "type": "string" }
+      },
+      "required": ["lastResetAt", "resetTime", "timezone"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "A conversation thread",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "createdAt", "updatedAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A message in a chat",
+      "type": "object",
+      "properties": {
+        "chatId": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "ai"] },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["chatId", "role", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/system_settings/global_clock": {
+      "schema": "GlobalClock",
+      "description": "Singleton document for system clock"
+    },
+    "/chats/{chatId}": {
+      "schema": "Chat",
+      "description": "Conversations"
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages within a chat"
+    }
+  }
+}

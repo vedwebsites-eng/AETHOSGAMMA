@@ -1,0 +1,318 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Connection Test Collection
+    match /test/{docId} {
+      allow get: if true;
+    }
+
+    // Helper Functions
+    function isSignedIn() { return request.auth != null; }
+    function isVerified() { 
+      return isSignedIn() && (
+        request.auth.token.email_verified == true || 
+        request.auth.token.firebase.sign_in_provider == 'google.com' ||
+        request.auth.token.email == 'ved.websites@gmail.com'
+      ); 
+    }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // UserStats Validation & Anti-Cheat
+    function isValidUserStats(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.level is int && data.level >= 1 && data.level <= 100 &&
+             data.experience is int && data.experience >= 0 &&
+             (!('currentStreak' in data) || (data.currentStreak is int && data.currentStreak >= 0));
+    }
+
+    // Task Validation
+    function isValidTask(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() <= 200 &&
+             data.priority in ['low', 'medium', 'high', 'critical'] &&
+             data.category in ['health', 'learning', 'creative', 'work', 'personal', 'routine'] &&
+             (!('timeEstimate' in data) || (data.timeEstimate is int && data.timeEstimate >= 1 && data.timeEstimate <= 480));
+    }
+
+    // JournalEntry Validation
+    function isValidJournalEntry(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.content is string && data.content.size() <= 50000 &&
+             data.mood in ['happy', 'ecstatic', 'neutral', 'worried', 'sad'] &&
+             (!('wordCount' in data) || (data.wordCount is int && data.wordCount >= 0)) &&
+             data.createdAt is string;
+    }
+
+    // TimeBlock Validation
+    function isValidTimeBlock(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() <= 200 &&
+             data.type in ['task', 'event', 'break', 'routine'] &&
+             data.startTime is string && data.endTime is string;
+    }
+
+    // UserSettings Validation
+    function isValidUserSettings(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             (!('difficultyMultiplier' in data) || data.difficultyMultiplier is number);
+    }
+
+    // MotivationItem Validation
+    function isValidMotivationItem(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.type in ['music', 'quote', 'link', 'text'] &&
+             data.content is string && data.content.size() <= 5000 &&
+             data.createdAt is string;
+    }
+
+    // LifeSnapshot Validation
+    function isValidLifeSnapshot(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.date is string && data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
+             data.values is map &&
+             data.balanceScore is number;
+    }
+
+    // Habit Validation
+    function isValidHabit(data) {
+      return data.userId is string && data.userId.size() <= 100 &&
+             data.name is string && data.name.size() <= 100 &&
+             data.category in ['health', 'learning', 'creative', 'work', 'personal', 'routine'] &&
+             data.frequency is string &&
+             (!('targetStreak' in data) || (data.targetStreak is int && data.targetStreak >= 1 && data.targetStreak <= 365));
+    }
+
+    // HabitLog Validation & Immutability
+    function isValidHabitLog(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.habitId is string && data.habitId.size() <= 128 &&
+             data.completed is bool &&
+             data.date is string && data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+
+    // WeeklyReview Validation
+    function isValidWeeklyReview(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             (!('wentWell' in data) || (data.wentWell is string && data.wentWell.size() <= 2000)) &&
+             (!('nextWeekFocus' in data) || (data.nextWeekFocus is string && data.nextWeekFocus.size() <= 2000)) &&
+             (!('didntGo' in data) || (data.didntGo is string && data.didntGo.size() <= 2000));
+    }
+
+    // WOOPPlan Validation
+    function isValidWOOP(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.wish is string && data.wish.size() <= 500 &&
+             data.outcome is string && data.outcome.size() <= 500 &&
+             data.obstacle is string && data.obstacle.size() <= 500 &&
+             data.plan is string && data.plan.size() <= 500 &&
+             data.status in ['active', 'completed', 'archived'];
+    }
+
+    // CoachMessage Validation
+    function isValidCoachMessage(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.sender in ['user', 'coach'] &&
+             data.text is string && data.text.size() <= 100000 &&
+             data.createdAt is string;
+    }
+
+    // Chat Validation
+    function isValidChat(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() <= 200 &&
+             data.createdAt is string;
+    }
+
+    // Message Validation
+    function isValidMessage(data) {
+      return data.chatId is string && data.chatId.size() <= 128 &&
+             data.role in ['user', 'ai'] &&
+             data.content is string && data.content.size() <= 100000 &&
+             data.createdAt is string;
+    }
+
+    // Immutability Check
+    function isImmutablePassed(coll) {
+      return incoming().userId == existing().userId &&
+             (!('createdAt' in existing()) || !('createdAt' in incoming()) || incoming().createdAt == existing().createdAt);
+    }
+
+    // --- Collections ---
+
+    // UserStats: Identified by userId
+    match /user_stats/{userId} {
+      function isAntiCheatPassed() {
+        return incoming().experience >= existing().experience &&
+               (incoming().experience - existing().experience <= 500) &&
+               (incoming().level == existing().level || incoming().level == existing().level + 1) &&
+               (!('currentStreak' in incoming()) || !('currentStreak' in existing()) || 
+                 incoming().currentStreak == existing().currentStreak || 
+                 incoming().currentStreak == existing().currentStreak + 1 || 
+                 incoming().currentStreak == 0 || 
+                 incoming().currentStreak == 1);
+      }
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isVerified() && isValidUserStats(incoming()) && incoming().userId == userId;
+      allow update: if isOwner(userId) && isVerified() && isValidUserStats(incoming()) && isImmutablePassed('user_stats') && isAntiCheatPassed();
+      allow delete: if false;
+    }
+
+    // UserSettings: Identified by userId
+    match /user_settings/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    // Tasks
+    match /tasks/{taskId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isVerified() && isValidTask(incoming()) && isOwner(incoming().userId) && isValidId(taskId);
+      allow update: if isVerified() && isOwner(existing().userId) && isValidTask(incoming()) && isImmutablePassed('tasks');
+      allow delete: if isVerified() && isOwner(existing().userId);
+    }
+
+    // Journals
+    match /journals/{journalId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isVerified() && isValidJournalEntry(incoming()) && isOwner(incoming().userId);
+      allow update: if isVerified() && isOwner(existing().userId) && isValidJournalEntry(incoming()) && isImmutablePassed('journals');
+      allow delete: if isVerified() && isOwner(existing().userId);
+    }
+
+    // TimeBlocks
+    match /time_blocks/{blockId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isVerified() && isValidTimeBlock(incoming()) && isOwner(incoming().userId) && isValidId(blockId);
+      allow update: if isVerified() && isOwner(existing().userId) && isValidTimeBlock(incoming()) && isImmutablePassed('time_blocks');
+      allow delete: if isVerified() && isOwner(existing().userId);
+    }
+
+    // MotivationItems
+    match /motivation_items/{itemId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isVerified() && isValidMotivationItem(incoming()) && isOwner(incoming().userId) && isValidId(itemId);
+      allow update: if isVerified() && isOwner(existing().userId) && isValidMotivationItem(incoming()) && isImmutablePassed('motivation_items');
+      allow delete: if isVerified() && isOwner(existing().userId);
+    }
+
+    // LifeSnapshots
+    match /life_snapshots/{snapshotId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isVerified() && isValidLifeSnapshot(incoming()) && isOwner(incoming().userId);
+      allow update, delete: if false;
+    }
+
+    // Habits
+    match /habits/{habitId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isVerified() && isValidHabit(incoming()) && isOwner(incoming().userId) && isValidId(habitId);
+      allow update: if isVerified() && isOwner(existing().userId) && isValidHabit(incoming()) && isImmutablePassed('habits');
+      allow delete: if isVerified() && isOwner(existing().userId);
+    }
+
+    // HabitLogs
+    match /habit_logs/{logId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // WeeklyReviews
+    match /weekly_reviews/{reviewId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isVerified() && isValidWeeklyReview(incoming()) && isOwner(incoming().userId) && isValidId(reviewId);
+      allow update: if isVerified() && isOwner(existing().userId) && isValidWeeklyReview(incoming()) && isImmutablePassed('weekly_reviews');
+      allow delete: if isVerified() && isOwner(existing().userId);
+    }
+
+    // YearlyGoals
+    match /yearly_goals/{docId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // DailyGoals
+    match /daily_goals/{docId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // WOOPPlans
+    match /users/{userId}/woop/{woopId} {
+      allow read: if isOwner(userId);
+      allow create: if isVerified() && isValidWOOP(incoming()) && isOwner(incoming().userId) && isValidId(woopId);
+      allow update: if isVerified() && isOwner(existing().userId) && isValidWOOP(incoming()) && isImmutablePassed('woop');
+      allow delete: if isVerified() && isOwner(existing().userId);
+    }
+
+    // CoachMessages
+    match /coach_messages/{messageId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isVerified() && isValidCoachMessage(incoming()) && isOwner(incoming().userId);
+      allow update: if isVerified() && isOwner(existing().userId) && isValidCoachMessage(incoming()) && isImmutablePassed('coach_messages');
+      allow delete: if isVerified() && isOwner(existing().userId);
+    }
+
+    // Chats
+    match /chats/{chatId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isVerified() && isValidChat(incoming()) && isOwner(incoming().userId) && isValidId(chatId);
+      allow update: if isVerified() && isOwner(existing().userId) && isValidChat(incoming()) && isImmutablePassed('chats');
+      allow delete: if isVerified() && isOwner(existing().userId);
+      
+      match /messages/{messageId} {
+        allow read: if isOwner(get(/databases/$(database)/documents/chats/$(chatId)).data.userId);
+        allow create: if isVerified() && isValidMessage(incoming()) && isOwner(get(/databases/$(database)/documents/chats/$(chatId)).data.userId) && isValidId(messageId);
+        allow update: if isVerified() && isOwner(get(/databases/$(database)/documents/chats/$(chatId)).data.userId) && isValidMessage(incoming()) && isImmutablePassed('messages');
+        allow delete: if isVerified() && isOwner(get(/databases/$(database)/documents/chats/$(chatId)).data.userId);
+      }
+    }
+
+    // CoachChats
+    match /coach_chats/{chatId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isOwner(incoming().userId);
+      allow update: if isOwner(existing().userId);
+      allow delete: if isOwner(existing().userId);
+    }
+
+    // CoachProfiles
+    match /coach_profiles/{profileId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isOwner(incoming().userId);
+      allow update: if isOwner(existing().userId);
+      allow delete: if isOwner(existing().userId);
+    }
+
+    // CoachMemory
+    match /coach_memory/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && incoming().userId == userId;
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // System Settings
+    match /system_settings/{docId} {
+      allow read: if isSignedIn();
+    }
+
+    // NotepadData
+    match /notepad_data/{docId} {
+      allow read: if isOwner(docId);
+      allow create: if isOwner(docId) && incoming().userId == docId;
+      allow update: if isOwner(docId) && incoming().userId == docId;
+      allow delete: if isOwner(docId);
+    }
+  }
+}

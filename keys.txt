@@ -1,0 +1,108 @@
+254:        <div key={i} style={{
+537:        <div key={i} style={{
+724:              key={i}
+737:                key={i}
+762:                key={i}
+778:              <g key={i}>
+912:        <div key={i} style={{
+1127:              <div key={i} style={{
+1202:                <div key={i} style={{
+1226:                <div key={i} style={{
+1247:                <div key={weekIdx} style={{
+1261:                      <div key={`${weekIdx}-${dayIdx}`} style={{
+1297:              <div key={count} style={{
+1802:              key={`radar-ring-${i}`} 
+1817:              key={`radar-axis-${cat.id || i}-${i}`}
+1852:            <g key={`radar-group-${cat.id || i}-${i}`}>
+2100:              <div key={`slider-cat-${cat.id || i}-${i}`} className="space-y-4">
+2234:                  <div key={snapshot.id || idx} className="p-4 bg-white/5 rounded-lg border border-white/5 flex justify-between items-center">
+2263:                  <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
+4452:                  key={`loading-dot-${i}`}
+4734:              key={activeTab}
+5001:          {tasks.map((task, index) => <div key={`test-task-${task.id || 'task'}-${index}`}>{task.title}</div>)}
+5002:          {habits.map((habit, index) => <div key={`test-habit-${habit.id || 'habit'}-${index}`}>{habit.name}</div>)}
+5003:          {journals.map((journal, index) => <div key={`test-journal-${journal.id || 'journal'}-${index}`}>{journal.content}</div>)}
+5004:          {achievements.map((achievement, index) => <div key={`test-ach-${achievement.id || 'ach'}-${index}`}>{achievement.title}</div>)}
+5005:          {timeBlocks.map((block, index) => <div key={`test-block-${block.id || 'block'}-${index}`}>{block.title}</div>)}
+5006:          {activityLog.map((activity, index) => <div key={`test-act-${activity.id || 'act'}-${index}`}>{activity.label}</div>)}
+5007:          {weeklyReviews.map((review, index) => <div key={`test-review-${review.id || 'review'}-${index}`}>{review.wentWell}</div>)}
+5042:            key={`xp-${n.id}-${idx}`}
+5071:        <div key={`${log.id}-${index}`} className="flex gap-2">
+5148:                   <div key={`${r}-${i}`} className="flex items-center gap-2 bg-white/5 border border-white/10 pl-3 pr-1 py-1 rounded-full group">
+5719:                key={stepObj.step}
+5854:                    key={idx}
+6003:              key={feature.number}
+6081:              <div key={stat.label} className="text-center">
+6216:                  key={value.title}
+6306:              <div key={item.label} className="flex items-center gap-2">
+6365:              key={`radar-scanner-${i}`}
+6421:                  key={cmd.id}
+6692:          key={m.label}
+6777:        <div key={`${activity.id || 'activity'}-${i}`}>
+6823:              <div key={`${t.id || 'upcoming'}-${idx}`} className="p-3 hover:bg-white/5 rounded flex justify-between items-center group cursor-default">
+6852:            <div key={`${ach.id || 'ach'}-${idx}`} className="space-y-2 opacity-60 hover:opacity-100 transition-opacity">
+7050:                          key={t}
+7171:                          key={mode}
+7218:                         key={`motivation-portal-${item.id}-${idx}`}
+7243:                                     key={i}
+7597:                        key={mode}
+7634:                        key={`motivation-list-yt-${item.id}-${idx}`}
+7653:                                  key={i}
+7677:                        key={`motivation-list-link-${item.id}-${idx}`}
+7698:                                  key={i}
+7717:                        key={`motivation-list-quote-${item.id}-${idx}`}
+7728:                      key={`motivation-list-note-${item.id}-${idx}`}
+8099:                  <label key={`task-habit-sel-${h.id || 'habit'}-${i}`} className="flex items-center gap-3 cursor-pointer group p-1.5 rounded hover:bg-white/5 transition-all text-text-m hover:text-white">
+8243:              key={`filtered-task-${task.id}-${idx}`} 
+8311:                      <div key={`${task.id}-sub-${st.id || 'sub'}-${sidx}`} className="flex items-center gap-3">
+8418:                  <label key={`tasksview-sync-panel-${h.id}-${i}`} className="flex items-center gap-3 cursor-pointer group p-2 rounded-lg hover:bg-white/5 transition-all text-text-m hover:text-white">
+8563:                   key={`reward-${i}`} 
+8578:                   key={`${u.id || 'unlock'}-${i}`} 
+8858:                  <div key={`${cat.category}-${catIdx}`} className="space-y-6">
+8863:                          key={`${item.title}-${idx}`}
+9110:                    key={`session-dot-${i}`} 
+9603:               <button key={mode} onClick={() => setViewMode(mode)} className={cn("px-4 py-1.5 rounded-md text-[10px] font-mono font-black uppercase transition-all", viewMode === mode ? "bg-accent text-white" : "text-text-m hover:text-text-p")}>{mode}</button>
+9610:            <div key={d} className="bg-background-nested p-4 text-[10px] font-mono font-black text-text-m uppercase text-center tracking-widest">{d}</div>
+9623:                key={day.toISOString()}
+9642:                   <div className="flex gap-0.5">{dayTasks.slice(0, 3).map((t, i) => (<div key={`task-dot-${t.id}-${i}`} className={cn("w-1.5 h-1.5 rounded-full", t.status === 'completed' ? "bg-success" : "bg-text-s")} />))}</div>
+9662:                  <button key={mode} onClick={() => setViewMode(mode)} className={cn("px-4 py-1.5 rounded-md text-[10px] font-mono font-black uppercase transition-all", viewMode === mode ? "bg-accent text-white" : "text-text-m hover:text-text-p")}>{mode}</button>
+9723:                <div key={hour} className="h-24 px-4 flex flex-col justify-start border-b border-white/5 relative">
+9737:                    <div key={day.toISOString()} className={cn("flex-1 min-w-[200px] relative h-[1824px] group/day", isToday && "bg-accent/5")}>
+9739:                         <div key={hour} className="h-24 border-b border-white/5 relative">
+9764:                             key={generatedKey}
+9895:                    key={`unscheduled-task-${task.id}-${idx}`} 
+9968:                        key={`sugg-${idx}-${s.title}`}
+10024:                     <button key={t.id} onClick={() => { applyTemplate(t.id, currentDate); setIsTemplateModalOpen(false); }} className="glass p-6 rounded-2xl border border-white/5 hover:border-accent/40 bg-white/2 hover:bg-accent/5 flex items-center justify-between text-left group transition-all">
+10050:                            <button key={type} onClick={() => setBlockForm({...blockForm, type})} className={cn("py-2 rounded-lg border text-[10px] font-mono font-black uppercase transition-all", blockForm.type === type ? "bg-accent border-accent text-white" : "border-white/10 text-text-m hover:bg-white/5")}>{type}</button>
+10223:                <div key={`heatmap-week-${weekIdx}`} className="flex flex-col gap-0.5 sm:gap-1">
+10227:                    if (!dayData) return <div key={`heatmap-day-empty-${weekIdx}-${dayIdx}`} className="w-3 h-3 sm:w-4 sm:h-4 rounded-sm bg-transparent" />;
+10231:                        key={`heatmap-day-${weekIdx}-${dayIdx}`}
+10465:                  <div key={`habit-list-${habit.id}-${idx}`}>
+10529:                key={selectedHabit.id}
+10642:                          <option key={cat.id} value={cat.id}>{cat.label.toUpperCase()}</option>
+10676:                             key={c}
+11059:                          <Cell key={`cell-${entry.date}-${index}`} fill={entry.mood && entry.mood >= 4 ? '#00ffaa' : entry.mood === 3 ? '#999' : '#ff0055'} />
+11111:                   <div key={`frequency-${d.name}-${i}`} className="flex flex-col items-center gap-3">
+11194:            key={`journal-history-${journal.id || 'journal'}-${index}`}
+11291:               key={tab} 
+11414:                          key={level.id}
+11440:                           key={tag}
+11462:                         <div key={stat.label} className="glass p-3 rounded-xl border border-white/5 text-center">
+11904:          <div key={line.id} className="group flex items-center gap-2">
+12143:                    <div key={r} title={`${r}: ${count}`} className={cn(
+12194:                <div key={`filtered-ach-${achievement.id}-${idx}`}>
+12273:              key={`shop-item-${item.id}-${index}`}
+12367:              key={cat.id}
+12488:                       key={d.val}
+12553:                         key={t.id}
+12594:                        key={a.id}
+12645:                       <div key={item.id} className="flex items-center justify-between p-6 bg-white/2 rounded-[2rem] border border-white/5 hover:bg-white/5 transition-all group">
+13008:                      <div key={`pending-${t.id || 'task'}-${i}`} className="py-2 px-1 border-b border-white/5 flex items-center justify-between gap-2 group transition-all hover:bg-white/2">
+13034:                               <label key={`sidebar-habit-sync-${h.id || 'habit'}-${i}`} className="flex items-center gap-2 cursor-pointer group p-1.5 rounded hover:bg-white/5 transition-all text-text-m hover:text-white">
+13126:                      <div key={`habit-${h.id || 'habit'}-${i}`} className="py-2 px-1 border-b border-white/5 flex items-center justify-between gap-2 group transition-all hover:bg-white/2">
+13158:                     <div key={`mini-day-name-${idx}`} className="font-black text-text-s">{d}</div>
+13162:                       key={`mini-day-num-${idx}`} 
+13183:              key={activeTab}
+13729:                 key={idx}
+13756:                 key={m.id || `fallback-msg-${idx}`} 
+13793:                     key={p.id}

@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --color-background: #050505;
+  --color-card: #111111;
+  --color-background-raised: #111111;
+  --color-background-nested: #1A1A1A;
+  --color-border-subtle: #1A1A1A;
+  
+  --color-accent: #FF4500;
+  --color-cyan: #00D9FF;
+  
+  --color-text-p: #FFFFFF;
+  --color-text-s: #B0B0B0;
+  --color-text-m: #6B6B6B;
+  
+  --color-success: #00CC44;
+  --color-warning: #FFB700;
+  --color-danger: #FF3D3D;
+}
+
+.light {
+  --color-background: #F1F5F9;
+  --color-card: #F8FAFC;
+  --color-background-raised: #F8FAFC;
+  --color-background-nested: #E2E8F0;
+  --color-border-subtle: #94A3B8;
+  
+  --color-text-p: #000000;
+  --color-text-s: #1E293B;
+  --color-text-m: #334155;
+
+  --color-accent: #C2410C;
+  --color-cyan: #0369A1;
+  --color-success: #15803D;
+  --color-warning: #B45309;
+  --color-danger: #B91C1C;
+}
+
+@theme {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+
+  --color-background: var(--color-background);
+  --color-card: var(--color-card);
+  --color-background-raised: var(--color-background-raised);
+  --color-background-nested: var(--color-background-nested);
+  --color-border-subtle: var(--color-border-subtle);
+  
+  --color-accent: var(--color-accent);
+  --color-cyan: var(--color-cyan);
+  
+  --color-text-p: var(--color-text-p);
+  --color-text-s: var(--color-text-s);
+  --color-text-m: var(--color-text-m);
+  
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+
+  /* Custom Animations */
+  --animate-text-glow: text-glow 2s ease-in-out infinite alternate;
+  --animate-border-glow: border-glow 3s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes text-glow {
+    from { text-shadow: 0 0 5px rgba(255, 69, 0, 0.2), 0 0 10px rgba(255, 69, 0, 0.1); }
+    to { text-shadow: 0 0 10px rgba(255, 69, 0, 0.4), 0 0 20px rgba(255, 69, 0, 0.2); }
+  }
+
+  @keyframes border-glow {
+    0%, 100% { border-color: rgba(0, 217, 255, 0.1); }
+    50% { border-color: rgba(255, 69, 0, 0.3); }
+  }
+
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  @keyframes pulse-glow {
+    0% { box-shadow: 0 0 10px rgba(0, 217, 255, 0.2); }
+    50% { box-shadow: 0 0 20px rgba(0, 217, 255, 0.5); }
+    100% { box-shadow: 0 0 10px rgba(0, 217, 255, 0.2); }
+  }
+
+  @keyframes slide-infinite {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+}
+
+@layer utilities {
+  .animate-scanline {
+    animation: scanline 8s linear infinite;
+  }
+  .pulse-cyan {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  .animate-slide-infinite {
+    animation: slide-infinite 20s linear infinite;
+  }
+  .glass {
+    background: rgba(17, 17, 17, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .accent-glow {
+    box-shadow: 0 0 25px rgba(255, 69, 0, 0.3);
+  }
+  
+  .cyan-glow {
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.3);
+  }
+
+  .text-glow-cyan {
+    text-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+  }
+  
+  .text-glow-accent {
+    text-shadow: 0 0 15px rgba(255, 69, 0, 0.5);
+  }
+
+  .text-glow-white {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  }
+  
+  .text-glow-success {
+    text-shadow: 0 0 15px rgba(0, 255, 149, 0.4);
+  }
+
+  .premium-transition {
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text-p font-sans antialiased relative;
+    background-image: radial-gradient(circle at 50% 50%, rgba(20, 20, 20, 0.5) 0%, rgba(5, 5, 5, 1) 100%);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-bold tracking-tight text-text-p;
+  }
+  .bg-scanlines {
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.15) 50%
+    );
+    background-size: 100% 4px;
+  }
+}
+
+.cyber-grid {
+  background-image: 
+    linear-gradient(rgba(255, 69, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 69, 0, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-cyan);
+}
+
+.neon-border {
+  border: 1px solid rgba(0, 217, 255, 0.2);
+}
+
+.light .glass {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+}
+
+.light .cyber-grid {
+  background-image: 
+    linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Force text-white to be text-text-p in light mode for common usage */
+.light .text-white { color: var(--color-text-p) !important; }
+.light .text-text-m { color: var(--color-text-s); } /* Boost visibility of medium text */
+.light .bg-white\/5 { background-color: rgba(15, 23, 42, 0.05) !important; }
+.light .bg-white\/2 { background-color: rgba(15, 23, 42, 0.02) !important; }
+.light .border-white\/10 { border-color: rgba(15, 23, 42, 0.1) !important; }
+.light .border-white\/5 { border-color: rgba(15, 23, 42, 0.05) !important; }
+.light .bg-black\/40 { background-color: rgba(255, 255, 255, 0.6) !important; }
+.light .bg-black\/60 { background-color: rgba(255, 255, 255, 0.8) !important; }
+
+/* Ensure primary buttons and badges that use text-white on dark backgrounds stay white */
+.light .bg-accent .text-white,
+.light .bg-cyan .text-white,
+.light .bg-success .text-white,
+.light .bg-danger .text-white,
+.light .bg-accent.text-white,
+.light .bg-cyan.text-white {
+  color: #FFFFFF !important;
+}
+
+.scrollbar-hide::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.scrollbar-hide,
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+

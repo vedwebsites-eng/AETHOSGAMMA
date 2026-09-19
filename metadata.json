@@ -1,0 +1,6 @@
+{
+  "name": "Aether: Live Life Gamified",
+  "description": "A deep-black, high-energy gamification hub for tasks, journals, and daily life tracking with real-time stats and cyberpunk aesthetics.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
