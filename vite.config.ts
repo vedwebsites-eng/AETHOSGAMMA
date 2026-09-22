@@ -26,5 +26,22 @@ export default defineConfig(({ mode }) => {
       },
     },
 
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'react-core': ['react', 'react-dom'],
+            'firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/analytics'],
+            'tiptap': ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/extension-color', '@tiptap/extension-link', '@tiptap/extension-text-style', '@tiptap/extension-underline'],
+            'charts': ['recharts'],
+            'motion': ['motion'],
+            'markdown': ['react-markdown'],
+            'utils': ['date-fns', 'date-fns-tz', 'clsx', 'tailwind-merge', 'lucide-react'],
+          },
+        },
+      },
+      chunkSizeWarningLimit: 800,
+    },
+
   };
 });

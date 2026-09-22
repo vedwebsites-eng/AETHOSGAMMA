@@ -314,5 +314,26 @@ service cloud.firestore {
       allow update: if isOwner(docId) && incoming().userId == docId;
       allow delete: if isOwner(docId);
     }
+
+    // WinsLog (Evidence Vault)
+    match /wins_log/{docId} {
+      allow read: if isSignedIn() && request.auth.uid == resource.data.userId;
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    // FlowLogs (Flow State Logger)
+    match /flow_logs/{docId} {
+      allow read: if isSignedIn() && request.auth.uid == resource.data.userId;
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    // GratitudeLogs
+    match /gratitude_logs/{docId} {
+      allow read: if isSignedIn() && request.auth.uid == resource.data.userId;
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
   }
 }

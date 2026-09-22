@@ -7,6 +7,25 @@ import multer from "multer";
 dotenv.config();
 
 const app = express();
+// Simple in-memory rate limiter — 30 req/min per IP
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+function rateLimit(req: any, res: any, next: any) {
+  const ip = req.ip || 'unknown';
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 60000 });
+    return next();
+  }
+  if (entry.count >= 30) {
+    return res.status(429).json({ error: 'Rate limit exceeded. Try again in a minute.' });
+  }
+  entry.count++;
+  return next();
+}
+
+// Apply rate limit to all AI routes
+app.use('/api/gemini', rateLimit);
 app.use(express.json({limit: '50mb'}));
 const upload = multer({ storage: multer.memoryStorage() });
 const PORT = 3000;
@@ -95,6 +114,7 @@ app.post("/api/gemini/analyze-journal", async (req, res) => {
 
     const callOpenRouter = async (model: string) => fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
@@ -136,6 +156,7 @@ app.post("/api/gemini/suggest-password", async (req, res) => {
 
     const callOpenRouter = async (model: string) => fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
@@ -176,6 +197,7 @@ app.post("/api/gemini/breakdown-task", async (req, res) => {
 
     const callOpenRouter = async (model: string) => fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
@@ -226,6 +248,7 @@ app.post("/api/gemini/daily-briefing", async (req, res) => {
 
     const callOpenRouter = async (model: string) => fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
@@ -284,6 +307,7 @@ app.post("/api/gemini/life-balance", async (req, res) => {
 
     const callOpenRouter = async (model: string) => fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
@@ -336,6 +360,7 @@ app.post("/api/gemini/life-insight", async (req, res) => {
 
     const callOpenRouter = async (model: string) => fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
@@ -449,7 +474,29 @@ These are reasoning patterns to apply naturally in your own words — never reci
     if (context) {
       const { lifeSyncCurrent, pendingTasks, completedTodayCount, activeHabits, recentJournals, recentGratitude, coreValues, evidenceVault, lowStateDetected, woop } = context;
 
-      systemIns += `\n\n=== SELF-COMPASSION PROTOCOL ===
+      systemIns += `\n\n=== CRISIS SAFETY — TIER 3 (HIGHEST PRIORITY) ===
+This section OVERRIDES everything else in this prompt.
+
+TRIGGER — if the user says or clearly implies ANY of:
+- They want to hurt themselves, end their life, or disappear
+- They feel there is no point in continuing
+- Phrases like "I want to die", "I can't do this anymore", "no one would miss me", "I'm done", "I give up on everything"
+
+MANDATORY RESPONSE PATTERN when triggered — follow this exactly, no exceptions:
+1. Acknowledge what they said directly. Do not minimize, reframe, or pivot.
+2. Say clearly: "What you're feeling matters. Please reach out to someone who can help right now."
+3. Provide these resources — always include ALL of them:
+   - India: iCall — 9152987821 | Vandrevala Foundation — 1860-2662-345 (24/7) | AASRA — 9820466627
+   - International: 988 Suicide & Crisis Lifeline (US/Canada) | Crisis Text Line — Text HOME to 741741
+4. Tell them AETHOS is here when they're ready to talk, but a real human needs to hear from them now.
+5. Do NOT continue the coaching session after this. Do NOT ask follow-up questions. Do NOT provide tasks, XP, or productivity advice.
+6. Do NOT say "I'm just an AI" — it deflects. Say "I hear you" instead.
+
+BANNED in a crisis response: productivity tips, silver linings, "it gets better", task creation, XP mentions, cyberpunk UI language.
+
+`;
+
+    systemIns += `\n\n=== SELF-COMPASSION PROTOCOL ===
 This section overrides your default response pattern when the user is in a confirmed low state.
 
 A low state is confirmed when: their recent journal shows a sad or anxious mood AND their streak is below 3, OR their task completion rate this week is critically low. The frontend will send lowStateDetected: true in this case.
@@ -748,6 +795,7 @@ app.post("/api/gemini/generate-chat-title", async (req, res) => {
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
@@ -788,6 +836,7 @@ app.post("/api/gemini/estimate-xp", async (req, res) => {
 
     const callOpenRouter = async (model: string) => fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
@@ -824,6 +873,7 @@ app.post("/api/gemini/update-memory", async (req, res) => {
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
@@ -882,6 +932,7 @@ app.post("/api/gemini/generate-timetable", async (req, res) => {
 
     const callOpenRouter = async (model: string) => fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,

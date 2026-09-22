@@ -44,6 +44,7 @@ import { HabitSpreadsheet } from './components/HabitSpreadsheet';
 import { WOOPPlan } from './types';
 import { chronos } from './services/chronos';
 import { ChronosClock } from './components/ChronosClock';
+import { StreakVisualizer } from './components/StreakVisualizer';
 import { SystemCalibrating } from './components/SystemCalibrating';
 import { toPng } from 'html-to-image';
 
@@ -3526,7 +3527,7 @@ export default function App() {
     const habitsQ = query(
       collection(db, 'habits'),
       where('userId', '==', user.uid),
-      limit(100)
+      limit(200)
     );
     const unsubHabits = onSnapshot(habitsQ, (snapshot) => {
       if (!snapshot) return;
@@ -4989,6 +4990,7 @@ export default function App() {
               )}
               {activeTab === 'reflect' && (
                 <ErrorBoundary name="Reflective_Cognition_Engine">
+                  <React.Suspense fallback={<div className="flex items-center justify-center h-64"><div className="w-6 h-6 border-2 border-accent/30 border-t-accent rounded-full animate-spin" /></div>}>
                   <ReflectView
                     journals={journals}
                     user={user}
@@ -5001,6 +5003,7 @@ export default function App() {
                     deleteJournalEntry={deleteJournalEntry}
                     deleteAllJournals={deleteAllJournals}
                   />
+                  </React.Suspense>
                 </ErrorBoundary>
               )}
               {activeTab === 'aetherCoach' && (
@@ -5026,6 +5029,7 @@ export default function App() {
               )}
               {activeTab === 'grow' && (
                 <ErrorBoundary name="Grow_Ascension_Matrix">
+                  <React.Suspense fallback={<div className="flex items-center justify-center h-64"><div className="w-6 h-6 border-2 border-accent/30 border-t-accent rounded-full animate-spin" /></div>}>
                   <GrowView
                     stats={stats}
                     user={user}
@@ -5042,6 +5046,7 @@ export default function App() {
                     saveNotepadLines={saveNotepadLines}
                     convertNotepadLineToTask={convertNotepadLineToTask}
                   />
+                  </React.Suspense>
                 </ErrorBoundary>
               )}
               {activeTab === 'configOs' && (
@@ -7736,12 +7741,13 @@ function Dashboard({
              </div>
              <QuickStatsGrid stats={stats} journals={journals} tasks={tasks} />
              <ChronosClock />
+             <StreakVisualizer journals={journals} tasks={tasks} />
           </section>
 
           <DailyChallengeWidget stats={stats} />
 
           {/* NEURAL FEED */}
-          <section className="space-y-4 h-[300px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/20">
+          <section className={`space-y-4 overflow-y-auto transition-all duration-500 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/20 ${quickOverrideOpen ? 'h-[300px]' : 'h-[520px]'}`}>
             <div className="flex items-center justify-between mb-3 sticky top-0 bg-black/50 backdrop-blur z-10 pb-2">
               <div>
                 <p className="text-[10px] font-mono font-black text-white/80 uppercase tracking-widest">NEURAL_FEED</p>
@@ -13425,7 +13431,30 @@ function AetherCoachTabView({ stats, user, journals, tasks = [], habits = [], ha
                     ))}
                   </div>
                 )}
-                {m.sender === 'coach' && (
+              {m.sender === 'coach' && (m.text || '').match(/iCall|Vandrevala|AASRA|988.*Suicide|Crisis Text Line/i) && (
+                <div className="mt-3 p-4 bg-red-950/40 border border-red-500/30 rounded-2xl space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <p className="text-[9px] font-mono font-black text-red-400 uppercase tracking-widest">CRISIS_SUPPORT_RESOURCES</p>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    {[
+                      { label: 'iCall (India)', value: '9152987821' },
+                      { label: 'Vandrevala Foundation', value: '1860-2662-345' },
+                      { label: 'AASRA (India)', value: '9820466627' },
+                      { label: '988 Lifeline (US/CA)', value: '988' },
+                    ].map(r => (
+                      <a key={r.label} href={`tel:${r.value.replace(/-/g,'')}`}
+                        className="flex items-center justify-between px-3 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-all">
+                        <span className="text-[10px] font-mono text-white/70">{r.label}</span>
+                        <span className="text-[11px] font-mono font-black text-red-300">{r.value}</span>
+                      </a>
+                    ))}
+                  </div>
+                  <p className="text-[9px] font-mono text-white/30">Tap any number to call. These are confidential services.</p>
+                </div>
+              )}
+              {m.sender === 'coach' && (
                   <div className="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={async () => {
