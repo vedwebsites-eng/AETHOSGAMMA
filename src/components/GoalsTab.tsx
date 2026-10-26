@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { format, subDays } from 'date-fns';
-import { addDoc, collection, doc, updateDoc, getFirestore } from 'firebase/firestore';
+import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import { ChevronLeft, ChevronRight, Trash2, Flame, Check, Plus } from 'lucide-react';
 
-const db = getFirestore();
+
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 export function GoalsTab({ user, yearlyGoals, dailyGoals, dailyGoalStreak, onAddXP }: any) {

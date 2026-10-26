@@ -4460,6 +4460,17 @@ export default function App() {
     }
   };
 
+  const updateHabit = async (habitId: string, updates: Partial<Habit>) => {
+    if (!user) return;
+    try {
+      await updateDoc(doc(db, 'habits', habitId), updates);
+      setCompleteToast('Habit updated');
+      setTimeout(() => setCompleteToast(null), 3000);
+    } catch (e) {
+      handleFirestoreError(e, OperationType.UPDATE, 'habits');
+    }
+  };
+
   const deleteHabit = async (id: string) => {
     try {
       await updateDoc(doc(db, 'habits', id), { isArchived: true });
@@ -12676,6 +12687,7 @@ function DailyWorkView({
             habitLogs={habitLogs}
             onToggleHabit={onToggleHabit}
             onAddHabit={onAddHabit}
+            onUpdateHabit={updateHabit}
             onDeleteHabit={onDeleteHabit}
             stats={stats}
           />

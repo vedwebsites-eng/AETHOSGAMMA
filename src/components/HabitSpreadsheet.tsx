@@ -1,18 +1,42 @@
 import React, { useState, useRef } from 'react';
 import { format, getDaysInMonth } from 'date-fns';
 import { Plus, Trash2, ChevronLeft, ChevronRight, Flame } from 'lucide-react';
-import { updateDoc, doc, getFirestore } from 'firebase/firestore';
+import { updateDoc, doc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
-const db = getFirestore();
+
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
-export function HabitSpreadsheet({ habits, habitLogs, onToggleHabit, onAddHabit, onDeleteHabit, stats }: any) {
+export function HabitSpreadsheet({ habits, habitLogs, onToggleHabit, onAddHabit, onUpdateHabit, onDeleteHabit, stats }: any) {
   const now = new Date();
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [showAddForm, setShowAddForm] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
-  const [selectedHabit, setSelectedHabit] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editCategory, setEditCategory] = useState('');
+  const [editTarget, setEditTarget] = useState(0);
+  const [editFrequency, setEditFrequency] = useState('');
+
+  const handleEdit = (habit: any) => {
+    setEditName(habit.name);
+    setEditCategory(habit.category);
+    setEditTarget(habit.targetStreak);
+    setEditFrequency(habit.frequency);
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    await onUpdateHabit(selectedHabit.id, { 
+      name: editName,
+      category: editCategory,
+      targetStreak: Number(editTarget),
+      frequency: editFrequency
+    });
+    setSelectedHabit({ ...selectedHabit, name: editName, category: editCategory, targetStreak: Number(editTarget), frequency: editFrequency });
+    setIsEditing(false);
+  };
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const daysInMonth = getDaysInMonth(new Date(viewYear, viewMonth));
@@ -193,21 +217,44 @@ export function HabitSpreadsheet({ habits, habitLogs, onToggleHabit, onAddHabit,
       {selectedHabit && (
         <div className="glass border border-white/10 rounded-2xl p-5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-mono font-black text-white uppercase">{selectedHabit.name}</p>
-            <button onClick={() => setSelectedHabit(null)} className="text-text-s hover:text-white text-xs">✕</button>
+            {isEditing ? (
+              <input value={editName} onChange={e => setEditName(e.target.value)} className="text-xs font-mono font-black text-white uppercase bg-white/5 border border-white/10 rounded-md p-1 outline-none" />
+            ) : (
+              <p className="text-xs font-mono font-black text-white uppercase">{selectedHabit.name}</p>
+            )}
+            <div className="flex items-center gap-2">
+              {isEditing ? (
+                <button onClick={handleSave} className="text-success hover:text-white text-xs font-black">SAVE</button>
+              ) : (
+                <button onClick={() => handleEdit(selectedHabit)} className="text-cyan hover:text-white text-xs font-black">EDIT</button>
+              )}
+              <button onClick={() => { setSelectedHabit(null); setIsEditing(false); }} className="text-text-s hover:text-white text-xs">✕</button>
+            </div>
           </div>
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="bg-white/5 rounded-xl p-3">
               <p className="text-[9px] font-mono text-text-s uppercase opacity-50">Category</p>
-              <p className="text-[11px] font-mono font-black text-white uppercase">{selectedHabit.category}</p>
+              {isEditing ? (
+                <input value={editCategory} onChange={e => setEditCategory(e.target.value)} className="text-[11px] font-mono font-black text-white uppercase bg-white/5 border border-white/10 rounded-md p-1 outline-none w-full text-center" />
+              ) : (
+                <p className="text-[11px] font-mono font-black text-white uppercase">{selectedHabit.category}</p>
+              )}
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <p className="text-[9px] font-mono text-text-s uppercase opacity-50">Target</p>
-              <p className="text-[11px] font-mono font-black text-warning">{selectedHabit.targetStreak}d</p>
+              {isEditing ? (
+                <input type="number" value={editTarget} onChange={e => setEditTarget(Number(e.target.value))} className="text-[11px] font-mono font-black text-warning bg-white/5 border border-white/10 rounded-md p-1 outline-none w-full text-center" />
+              ) : (
+                <p className="text-[11px] font-mono font-black text-warning">{selectedHabit.targetStreak}d</p>
+              )}
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <p className="text-[9px] font-mono text-text-s uppercase opacity-50">Frequency</p>
-              <p className="text-[11px] font-mono font-black text-cyan uppercase">{selectedHabit.frequency}</p>
+              {isEditing ? (
+                <input value={editFrequency} onChange={e => setEditFrequency(e.target.value)} className="text-[11px] font-mono font-black text-cyan uppercase bg-white/5 border border-white/10 rounded-md p-1 outline-none w-full text-center" />
+              ) : (
+                <p className="text-[11px] font-mono font-black text-cyan uppercase">{selectedHabit.frequency}</p>
+              )}
             </div>
           </div>
           {selectedHabit.rewardBundle && (
